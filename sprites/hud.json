@@ -1,0 +1,5 @@
+{
+	"MonitorHUD": { "File": "effecthud.png", "Rect":  "0,0,21,20", "Center": "10,10" },
+	"MonitorHUD_temp": { "File": "effecthud.png", "Rect":  "22,0,21,20", "Center": "10,10" },
+	"monitor_icon_empty": { "File": "effecthud.png", "Rect":  "2,2,16,16", "Center": "8,8" }
+}

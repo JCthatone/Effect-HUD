@@ -1,0 +1,12 @@
+{
+	"Metadata":
+	{
+		"Name": "Effect HUD",
+		"UniqueID": "competitionthinghud",
+		"Author": "JC_Thatone",
+		"Description": "A HUD mod that adds a hud for the effects.",
+		"URL": "https://sonic3air.org",
+		"ModVersion": "1.0",
+		"GameVersion": "20.04.26.0"
+	}
+}

@@ -1,0 +1,55 @@
+//# address-hook(0x00db44) end(0x00dbb2)
+function void RenderHUD()
+{
+    s16 baseX = global.level_started
+	if (baseX < 0)
+	{
+		baseX += 8
+		global.level_started = baseX
+	}
+	baseX += 0x0f
+	s16 baseY = 0x08 // char.bonus_effect & char.bonus.SPEED_UP
+	u16 renderQueue = 0xe000
+
+	bool isBonusStage = (global.zone >= 0x13 && global.zone <= 0x15)
+
+    if (!debug_mode.state)
+	{
+		if (!isBonusStage)
+		{
+            u64 key = Monitor.getHUDIconSpriteKey()
+			HUD.drawSprite("MonitorHUD", getScreenWidth() / 2, baseY + 0x10, renderQueue)
+            HUD.drawSprite(key, getScreenWidth() / 2, baseY + 0x10, renderQueue)
+
+			if (u8[0xffffb02b] & char.bonus.SPEED_UP)
+			{
+				HUD.drawSprite("MonitorHUD_temp", getScreenWidth() / 2 + 40, baseY + 0x10, renderQueue)
+				HUD.drawSprite("monitor_icon_speedshoes", getScreenWidth() / 2 + 40, baseY + 0x10, renderQueue)
+			}
+
+			if (super.active != 0)
+			{
+				HUD.drawSprite("MonitorHUD_temp", getScreenWidth() / 2 - 40, baseY + 0x10, renderQueue)
+				HUD.drawSprite("monitor_icon_super", getScreenWidth() / 2 - 40, baseY + 0x10, renderQueue)
+			}
+        }
+    }
+
+    base.RenderHUD()
+}
+
+function u64 Monitor.getHUDIconSpriteKey()
+{
+	if (u8[0xffffb02b] & char.bonus.SHIELD_BUBBLE)
+		return "monitor_icon_bubbleshield"
+	else if (u8[0xffffb02b] & char.bonus.SHIELD_FIRE)
+		return "monitor_icon_fireshield"
+	else if (u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING)
+		return "monitor_icon_lightningshield"
+	else if (u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING)
+		return "monitor_icon_lightningshield"
+	else if (u8[0xffffb02b] & char.bonus.INVINCIBLE) && (super.active == 0)
+		return "monitor_icon_invincibility"
+
+	return "monitor_icon_empty"
+}
