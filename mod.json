@@ -6,7 +6,16 @@
 		"Author": "JC_Thatone",
 		"Description": "A HUD mod that adds a hud for the effects.",
 		"URL": "https://sonic3air.org",
-		"ModVersion": "1.0",
+		"ModVersion": "1.2",
 		"GameVersion": "20.04.26.0"
+	},
+	"OtherMods":
+	{
+		"Monitors +":
+		{
+			"DisplayName": "Monitors Plus",
+			"IsRequired": "0",
+			"Priority": "Lower"
+		}
 	}
 }

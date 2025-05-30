@@ -12,25 +12,28 @@ function void RenderHUD()
 	u16 renderQueue = 0xe000
 
 	bool isBonusStage = (global.zone >= 0x13 && global.zone <= 0x15)
+	bool hassolemerald = (System.getGlobalVariableValueByName("AIZ.SolEmerald") == 1 || System.getGlobalVariableValueByName("HCZ.SolEmerald") == 1 || System.getGlobalVariableValueByName("MGZ.SolEmerald") == 1 || System.getGlobalVariableValueByName("ICZ.SolEmerald") == 1 || System.getGlobalVariableValueByName("SOZ.SolEmerald") == 1 || System.getGlobalVariableValueByName("LRZ.SolEmerald") == 1 || System.getGlobalVariableValueByName("HPZ.SolEmerald") == 1)
 
     if (!debug_mode.state)
 	{
 		if (!isBonusStage)
 		{
-            u64 key = Monitor.getHUDIconSpriteKey()
-			HUD.drawSprite("MonitorHUD", getScreenWidth() / 2, baseY + 0x10, renderQueue)
-            HUD.drawSprite(key, getScreenWidth() / 2, baseY + 0x10, renderQueue)
-
-			if (u8[0xffffb02b] & char.bonus.SPEED_UP)
+			if (!isMarioBros(global.characters))
 			{
-				HUD.drawSprite("MonitorHUD_temp", getScreenWidth() / 2 + 40, baseY + 0x10, renderQueue)
-				HUD.drawSprite("monitor_icon_speedshoes", getScreenWidth() / 2 + 40, baseY + 0x10, renderQueue)
+				HUD.drawSprite("MonitorHUD", getScreenWidth() / 2, baseY + (hassolemerald ? 0x15 :0x10), renderQueue)
+				HUD.drawSprite(Monitor.getHUDIconSpriteKey(0), getScreenWidth() / 2, baseY + (hassolemerald ? 0x15 :0x10), renderQueue)
 			}
 
-			if (super.active != 0)
+			if (IsSlotAvailable(1))
 			{
-				HUD.drawSprite("MonitorHUD_temp", getScreenWidth() / 2 - 40, baseY + 0x10, renderQueue)
-				HUD.drawSprite("monitor_icon_super", getScreenWidth() / 2 - 40, baseY + 0x10, renderQueue)
+				HUD.drawSprite("MonitorHUD_temp", getScreenWidth() / 2 + 40, baseY + (hassolemerald ? 0x15 :0x10), renderQueue)
+				HUD.drawSprite(Monitor.getHUDIconSpriteKey(1), getScreenWidth() / 2 + 40, baseY + (hassolemerald ? 0x15 :0x10), renderQueue)
+			}
+
+			if (IsSlotAvailable(2))
+			{
+				HUD.drawSprite("MonitorHUD_temp", getScreenWidth() / 2 - 40, baseY + (hassolemerald ? 0x15 :0x10), renderQueue)
+				HUD.drawSprite(Monitor.getHUDIconSpriteKey(2), getScreenWidth() / 2 - 40, baseY + (hassolemerald ? 0x15 :0x10), renderQueue)
 			}
         }
     }
@@ -38,18 +41,79 @@ function void RenderHUD()
     base.RenderHUD()
 }
 
-function u64 Monitor.getHUDIconSpriteKey()
+function u64 Monitor.getHUDIconSpriteKey(u8 Slot)
 {
-	if (u8[0xffffb02b] & char.bonus.SHIELD_BUBBLE)
-		return "monitor_icon_bubbleshield"
-	else if (u8[0xffffb02b] & char.bonus.SHIELD_FIRE)
-		return "monitor_icon_fireshield"
-	else if (u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING)
-		return "monitor_icon_lightningshield"
-	else if (u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING)
-		return "monitor_icon_lightningshield"
-	else if (u8[0xffffb02b] & char.bonus.INVINCIBLE) && (super.active == 0)
-		return "monitor_icon_invincibility"
+	if (Slot == 0)
+	{
+		if (u8[0xffffb02b] & char.bonus.SHIELD_BUBBLE)
+			return "monitor_icon_bubbleshield"
+		else if (u8[0xffffb02b] & char.bonus.SHIELD_FIRE)
+			return "monitor_icon_fireshield"
+		else if (u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING)
+			return "monitor_icon_lightningshield"
+		else if (u8[0xffffb02b] & char.bonus.SHIELD_LIGHTNING)
+			return "monitor_icon_lightningshield"
+
+		//MONITORS PLUS
+
+		if Mods.isModActive("Monitors +")
+		{
+			if (System.getGlobalVariableValueByName("ExtraShield") == 1)
+				return "monitor_icon_gold_shield"
+			else if (System.getGlobalVariableValueByName("ExtraShield") == 2)
+				return "monitor_icon_ice_shield"
+			else if (System.getGlobalVariableValueByName("ExtraShield") == 3)
+				return "monitor_icon_wind_shield"
+			else if (System.getGlobalVariableValueByName("ExtraShield") == 4)
+				return "monitor_icon_orbinaut_shield"
+		}
+	}
+	else if (Slot == 1)
+	{
+		if (u8[0xffffb02b] & char.bonus.SPEED_UP)
+			return "monitor_icon_speedshoes"
+
+		//MONITORS PLUS
+
+		if Mods.isModActive("Monitors +")
+		{
+			if (System.getGlobalVariableValueByName("SlowDown") == 1)
+				return "monitor_icon_grey_sneakers"
+		}
+	}
+	else
+	{
+		if (u8[0xffffb02b] & char.bonus.INVINCIBLE)
+		{
+			if (super.active == 0)
+				return "monitor_icon_invincibility"
+			else
+			{
+				if (super.active == 1)
+					return "monitor_icon_super"
+				else if (super.active == 2 && System.getGlobalVariableValueByName("Sonic.StandaloneChar") == 2 && u8[0xffffe654] == 0 && global.characters <= 3)
+					return "monitor_icon_burning"
+				else if (super.active == 0xff)
+					return "monitor_icon_hyper"
+			}
+		}
+	}
 
 	return "monitor_icon_empty"
+}
+
+function bool IsSlotAvailable(u8 Slot)
+{
+	if ((Slot == 1) && ((u8[0xffffb02b] & char.bonus.SPEED_UP) || (System.getGlobalVariableValueByName("SlowDown") == 1)))
+		return true
+
+	if ((Slot == 2) && ((super.active != 0)))
+		return true
+
+	return false
+}
+
+function bool isMarioBros(u8 slot)
+{
+	return base.isMarioBros(slot)
 }
